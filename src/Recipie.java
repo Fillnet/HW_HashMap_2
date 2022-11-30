@@ -1,33 +1,42 @@
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 public class Recipie {
     private final String name;
-    private final Set<Product> products;
+    private final Map<Product, Integer> products = new HashMap<>();
 
-    public Recipie(String name, Set<Product> products) {
-        if (name == null || name.isBlank() || products == null || products.size() == 0) {
+    public Recipie(String name) {
+        if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("НЕ все поля рецепта заполнены");
         }
-        this.name=name;
-        this.products=products;
+        this.name = name;
     }
 
     public String getName() {
         return name;
     }
 
+    public void addProduct(Product product, int quanty) {
+        if (quanty <= 0) {
+            quanty = 1;
+        }
+        if (this.products.containsKey(product)) {
+            this.products.put(product, this.products.get(product) + quanty);
+        } else {
+            this.products.put(product, quanty);
+        }
+    }
+
     public float getRecipiePrice() {
         float sum = 0;
-        for (Product product : products) {
-            sum+=product.getPrice();
+        for (Map.Entry<Product, Integer> product : products.entrySet()) {
+            sum += product.getKey().getPrice() * product.getValue();
         }
         return sum;
     }
 
-    public Set<Product> getProducts() {
-        return products;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -37,7 +46,7 @@ public class Recipie {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Recipie recipie=(Recipie) o;
+        Recipie recipie = (Recipie) o;
         return Objects.equals(name, recipie.name);
     }
 
@@ -49,9 +58,9 @@ public class Recipie {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Список продуктов в рецепте: ").append('\n');
-        for (Product product : this.products) {
-            stringBuilder.append(product.getName()).append('\n');
+        stringBuilder.append("Список купленных продуктов: ").append('\n');
+        for (Map.Entry<Product, Integer> product : products.entrySet()) {
+            stringBuilder.append(product.getKey()).append(" количество:" + product.getValue() + '\n');
         }
         return stringBuilder.toString();
     }
